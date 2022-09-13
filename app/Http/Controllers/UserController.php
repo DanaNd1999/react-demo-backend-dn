@@ -6,11 +6,11 @@ use App\Http\Requests\User\UserRequest;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use App\Services\User\UserService;
-use Illuminate\Http\Response;
-use Spatie\Permission\Models\Role;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use phpDocumentor\Reflection\Types\Resource_;
 
 class UserController extends Controller {
-    protected $userService;
+    protected UserService $userService;
 
     public function __construct( UserService $userService ) {
         $this->userService = $userService;
@@ -21,8 +21,10 @@ class UserController extends Controller {
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index() {
-        return $this->userService->index();
+    public function index(): AnonymousResourceCollection {
+        $users = $this->userService->index();
+
+        return UserResource::collection( $users);
     }
 
     /**
@@ -32,8 +34,10 @@ class UserController extends Controller {
      *
      * @return UserResource
      */
-    public function store( UserRequest $request ) {
-        return $this->userService->add( $request );
+    public function store( UserRequest $request ): UserResource{
+        $user = $this->userService->add( $request );
+
+        return new UserResource( $user );
     }
 
     /**
@@ -43,8 +47,8 @@ class UserController extends Controller {
      *
      * @return UserResource
      */
-    public function show( User $user ) {
-        return $this->userService->content( $user );
+    public function show( User $user ) : UserResource{
+        return new UserResource( $user );
     }
 
     /**
@@ -55,8 +59,8 @@ class UserController extends Controller {
      *
      * @return UserResource
      */
-    public function update( User $user, UserRequest $request ) {
-        return $this->userService->update( $request, $user );
+    public function update( User $user, UserRequest $request ) : void {
+        $this->userService->update( $request, $user );
     }
 
     /**
@@ -66,7 +70,7 @@ class UserController extends Controller {
      *
      * @return void
      */
-    public function destroy( User $user ) {
+    public function destroy( User $user ) : void {
         $this->userService->delete( $user );
     }
 }

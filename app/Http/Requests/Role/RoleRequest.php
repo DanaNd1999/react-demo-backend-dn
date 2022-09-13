@@ -12,8 +12,10 @@ class RoleRequest extends FormRequest {
      * @return bool
      */
     public function authorize() {
-        return true;
-    }
+        if (auth()->user()){
+            return true;
+        }
+        return  false;    }
 
     /**
      * Get the validation rules that apply to the request.

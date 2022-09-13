@@ -6,11 +6,10 @@ use App\Http\Requests\Permission\PermissionRequest;
 use App\Http\Resources\Permission\PermissionResource;
 use App\Models\Permission;
 use App\Services\Permission\PermissionService;
-use Illuminate\Http\Request;
-use Illuminate\Mail\PendingMail;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PermissionController extends Controller {
-    protected $permissionService;
+    protected PermissionService $permissionService;
 
     public function __construct( PermissionService $permissionService ) {
         $this->permissionService = $permissionService;
@@ -21,8 +20,10 @@ class PermissionController extends Controller {
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index() {
-        return $this->permissionService->index();
+    public function index(): AnonymousResourceCollection{
+        $permissions =  $this->permissionService->index();
+
+        return PermissionResource::collection( $permissions );
     }
 
     /**
@@ -32,8 +33,10 @@ class PermissionController extends Controller {
      *
      * @return PermissionResource
      */
-    public function store( PermissionRequest $request ) {
-        return $this->permissionService->add( $request);
+    public function store( PermissionRequest $request ) : PermissionResource {
+        $permission = $this->permissionService->add( $request);
+
+        return new PermissionResource( $permission );
     }
 
     /**
@@ -43,9 +46,9 @@ class PermissionController extends Controller {
      *
      * @return PermissionResource
      */
-    public function show( Permission $permission ) {
+    public function show( Permission $permission ) : PermissionResource {
 
-        return $this->permissionService->content( $permission);
+        return new PermissionResource( $permission );
     }
 
     /**
@@ -56,8 +59,8 @@ class PermissionController extends Controller {
      *
      * @return PermissionResource
      */
-    public function update( PermissionRequest $request, Permission $permission ) {
-        return $this->permissionService->update( $request, $permission );
+    public function update( Permission $permission, PermissionRequest $request ) : void {
+        $this->permissionService->update( $request, $permission );
     }
 
     /**

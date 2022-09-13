@@ -6,9 +6,10 @@ use App\Http\Requests\Role\RoleRequest;
 use App\Http\Resources\Role\RoleResource;
 use App\Models\Role;
 use App\Services\Role\RoleService;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class RoleController extends Controller {
-    protected $roleService;
+    protected RoleService $roleService;
 
     public function __construct( RoleService $roleService ) {
         $this->roleService = $roleService;
@@ -19,8 +20,10 @@ class RoleController extends Controller {
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index() {
-        return $this->roleService->index();
+    public function index(): AnonymousResourceCollection {
+        $roles = $this->roleService->index();
+
+        return RoleResource::collection( $roles );
     }
 
     /**
@@ -30,8 +33,10 @@ class RoleController extends Controller {
      *
      * @return RoleResource
      */
-    public function store( RoleRequest $request ) {
-        return $this->roleService->add( $request );
+    public function store( RoleRequest $request ) : RoleResource{
+        $role = $this->roleService->add( $request );
+
+        return new RoleResource( $role );
     }
 
     /**
@@ -41,8 +46,8 @@ class RoleController extends Controller {
      *
      * @return RoleResource
      */
-    public function show( Role $role ) {
-        return $this->roleService->content( $role );
+    public function show( Role $role ) : RoleResource {
+        return new RoleResource( $role );
     }
 
     /**
@@ -53,10 +58,8 @@ class RoleController extends Controller {
      *
      * @return RoleResource
      */
-    public function update( Role $role,  RoleRequest $request ) {
-
-        return $this->roleService->update( $role, $request );
-
+    public function update( Role $role, RoleRequest $request ) : void{
+        $this->roleService->update( $role, $request );
     }
 
     /**

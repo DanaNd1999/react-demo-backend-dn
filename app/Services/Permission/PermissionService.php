@@ -3,34 +3,23 @@
 
 namespace App\Services\Permission;
 
-
-use App\Http\Resources\Permission\PermissionResource;
 use App\Models\Permission;
 
 class PermissionService {
 
     public function index() {
-        $permissions = Permission::all();
-
-        return PermissionResource::collection( $permissions );
+        return Permission::paginate(5);
     }
 
-    public function add($request){
-        $permission = Permission::create(array_merge($request->only( 'name'), ['guard_name' => 'api']));
-
-        return new PermissionResource($permission);
+    public function add( $request ) {
+        return Permission::create( array_merge( $request->only( 'name' ), [ 'guard_name' => 'api' ] ) );
     }
 
-    public function content($permission){
-        return new PermissionResource( $permission );
+    public function update( $request, $permission ) {
+         $permission->update( $request->only( 'name' ) );
     }
 
-    public function update($request, $permission){
-        $permission->update( $request->only( 'name', 'guard_name' ) );
-        return new PermissionResource( $permission );
-    }
-
-    public function delete($permission){
+    public function delete( $permission ) {
         $permission->delete();
     }
 

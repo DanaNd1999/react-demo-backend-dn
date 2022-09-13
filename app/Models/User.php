@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -85,6 +86,20 @@ class User extends Authenticatable {
 
     public  function roles() {
         return $this->belongsToMany(Role::class,'user_has_roles', 'user_id', 'role_id');
+    }
+
+//    public function password(): Attribute {
+//        return Attribute::make(
+//            set: fn ($value) => Hash::make( $value ),
+//        );
+//    }
+
+    public function setPasswordAttribute($value){
+        $this->attributes['password'] = Hash::make( $value );
+    }
+
+    public function setNameAttribute($firstName, $lastName){
+        $this->name = $firstName . ' ' . $lastName;
     }
 
 }
